@@ -14,7 +14,7 @@
         <h1 class = "display-4">Weather Dashboard</h1>
     </header>
     <div class = "row no-gutters">
-        <div class = "col-3 search-area p-1">
+        <div class = "col-4 col-md-3 search-area p-1">
             <div class = "row no-gutters">
                 <label><h3>Search for City: </h3></label>
                 <form id = "city-form" class = "d-flex">
@@ -29,10 +29,9 @@
             </div>
 
         </div>
-        <div class = "col-9 p-1">
-            <div class = "row row-present-hdr no-gutters"></div>
-            <div class = "row row-present-list no-gutters"></div>
-            <div class = "row row-future no-gutters">
+        <div class = "col-8 col-md-9 p-1">
+            <div class = "row-present no-gutters mb-3 mb-lg-4"></div>
+            <div class = "row row-future no-gutters px-lg-2">
             </div>
         </div>
     </div>
@@ -82,8 +81,7 @@ function cityCheck(){
 
 
 function findCity(city){
-    $(".row-present-hdr").empty();
-    $(".row-present-list").empty();
+    $(".row-present").empty();
     $(".row-future").empty();
     
    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
@@ -99,24 +97,27 @@ function findCity(city){
        },
        error: function(jqXHR, textStatus, errorThrown) {
             isValid = false;
-            $(".row-present-hdr").append($("<h2>").addClass("present-hdr"));
+            
+            $(".row-present").append($("<h2>").addClass("present-hdr m-0 pl-lg-4"));
             $(".present-hdr").text("Sorry, we cannot find this city");
+            $(".row-present").addClass("present-border");
 
        }
    }).then(function(response){
        //console.log(response);
         cityCheck();
        //Make Header for present city + date + icon
-       $(".row-present-hdr").append($("<h2>").addClass("present-hdr"));
+       $(".row-present").addClass("present-border");
+       $(".row-present").append($("<h2>").addClass("present-hdr m-0 pl-lg-4 text-center text-md-left"));
         
        icon = response.weather[0].icon;
        var iconLink = "http://openweathermap.org/img/wn/" + icon + "@2x.png"; 
        $(".present-hdr").text(city + " (" + date + ")");
-       $(".present-hdr").append($("<img>").attr("src", iconLink));
+       $(".present-hdr").append($("<img>").addClass("icon").attr("src", iconLink));
         //Make ul with weather parameters
         var tempK = response.main.temp;
         var tempF = ((tempK - 273.15)*(9/5) + 32).toFixed(2);
-       $(".row-present-list").append($("<ul>").addClass("present-list"));
+       $(".row-present").append($("<ul>").addClass("present-list m-0 pl-lg-4 text-center text-md-left"));
        $(".present-list").append($("<li>").addClass("present-list-item").text("Temperature: " + tempF + " °F"));
        $(".present-list").append($("<li>").addClass("present-list-item").text("Humidity: " + response.main.humidity + "%"));
        $(".present-list").append($("<li>").addClass("present-list-item").text("Wind: " + response.wind.speed + " MPH"));
@@ -134,11 +135,21 @@ function futureWeather(city, lat, long){
        method: "GET",
    }).then(function(response){
        console.log(response.daily[5].temp.day)
+       //UVI CODE
+       var uvi = response.current.uvi;
+       var uviEl = $("<span>").addClass("uvi-span");
+       $(".present-list").append($("<li>").addClass("present-list-item-uv").text("UV Index: "));
+       var color = uviColor(uvi);
+       uviEl.addClass(color).text(uvi);
+       $(".present-list-item-uv").append(uviEl);
+
 
        for(var i = 1; i < 6; i++)
        {
-        var dayBox =  $("<div>").addClass("col");
-         $(".row-future").append(dayBox).attr("id", "day-" + (i));
+        var outer = $("<div>").addClass("col-12 col-sm-8 col-md-6 col-lg px-lg-2");
+        $(".row-future").append(outer)
+        var dayBox =  $("<div>").addClass("forecast");
+        outer.append(dayBox).attr("id", "day-" + (i));
         var nextDate = moment().add(i, "day").format("M[/]D[/]YYYY"); 
         dayBox.append($("<h3>").text(nextDate));
         var icon = response.daily[i].weather[0].icon;
@@ -146,9 +157,9 @@ function futureWeather(city, lat, long){
         dayBox.append($("<img>").attr("src", iconLink));
         var tempK = response.daily[i].temp.day;
         var tempF = ((tempK - 273.15)*(9/5) + 32).toFixed(2);
-        dayBox.append($("<p>").addClass("p").text(tempF));
+        dayBox.append($("<p>").addClass("p").text(("Temp: " + tempF + " °F")));
         var humidity = response.daily[i].humidity;
-        dayBox.append($("<p>").addClass("p").text(humidity));
+        dayBox.append($("<p>").addClass("p").text("Humidity: " + humidity + "%"));
 
        }
        console.log(dayBox);
@@ -157,7 +168,7 @@ function futureWeather(city, lat, long){
     })
 }
 
-getStorage();
+
 
 function searchCity(){
     //Trims and capitalizes first letter and passes to AJAX function
@@ -172,7 +183,32 @@ function searchCity(){
     findCity(city);
 
 }
+function uviColor(uvi){
+    var uvClass;
+    if(uvi >= 10){
+        uvClass = "uvi-very-high";
+        return uvClass;
+    }
+    if(uvi >= 7 && uvi < 10){
+        uvClass = "uvi-very-high";
+        return uvClass;
+    }
+    if(uvi >= 5 && uvi < 7){
+        uvClass = "uvi-md-high";
+        return uvClass;
+    }
+    if(uvi > 2 && uvi < 5){
+        uvClass = "uvi-md";
+        return uvClass;
+    }
+    if(uvi <= 2){
+        uvClass = "uvi-low";
+        return uvClass;
+    }
 
+}
+
+getStorage();
 
 $("#city-form").on("submit", function(event){
     event.preventDefault();

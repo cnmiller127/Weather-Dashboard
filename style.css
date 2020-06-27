@@ -40,3 +40,46 @@ width: 100%;
 .p{
     text-align: center;
 }
+
+.present-hdr{
+    display: block;
+}
+.present-list{
+    display: block;
+   
+}
+
+.forecast{
+    background-color: blue;
+    color: white;
+    text-align: center;
+}
+
+.present-border{
+    border-style: solid;
+    border-width: 2px;;
+    border-color: rgb(0, 0, 0);
+    border-radius: 1%;
+}
+
+/* uvi color classes*/
+.uvi-very-high{
+    background-color: purple;
+    color: white;
+}
+.uvi-high{
+    background-color: red;
+    color: white;
+}
+.uvi-md-high{
+    background-color: orange;
+    color: black;
+    }
+.uvi-md{
+background-color: yellow;
+color: black;
+}
+.uvi-low{
+    background-color: green;
+    color: white;
+}
