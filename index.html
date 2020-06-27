@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="reset.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Weather Dashboard</title>
+</head>
+<body>
+<div class = "container-fluid p-0">
+    <header class = "row jumbotron justify-content-center m-0">
+        <h1 class = "display-4">Weather Dashboard</h1>
+    </header>
+    <div class = "row no-gutters">
+        <div class = "col-3 search-area p-1">
+            <div class = "row no-gutters">
+                <label><h3>Search for City: </h3></label>
+                <form id = "city-form" class = "d-flex">
+                    <div class = "col-10 p-0">
+                        <input type = "text" id = "city-input">
+                    </div>
+                    <div class = "col-2 p-0 ">
+                        <button type = "button" id = "search-btn" class = "btn-primary">🔍</button>
+                    </div>
+                </form>
+                <div id = "btn-div" class = "btn-div"></div>
+            </div>
+
+        </div>
+        <div class = "col-9 p-1">
+            <div class = "row row-present-hdr no-gutters"></div>
+            <div class = "row row-present-list no-gutters"></div>
+            <div class = "row row-future no-gutters">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script type="text/javascript">
+
+//Javascript begins here
+
+
+var cities = [];
+var lat, long, city;
+storage = JSON.parse(localStorage.getItem("cities"));
+var  btnDiv =  $("#btn-div")
+var success, isValid, btnExists;
+var apiKey = "29a1f911181608772856f27dd8c13207";
+var date = moment().format("M[/]D[/]YYYY");
+
+function getStorage(){
+    if(storage !== null){
+    cities = storage;
+    cities.forEach(city => {
+        btnDiv.append($("<button>").addClass("city-btn").text(city));
+        }); 
+    }
+}
+//Checks button list for matching city
+function cityCheck(){
+    cities.forEach(citEl => {
+        if(city.trim() === citEl.trim())
+        {
+            btnExists = true;
+           
+        }
+        
+    });
+       if(btnExists === false){
+            cities.push(city);
+            btnDiv.append($("<button>").addClass("city-btn").text(city));
+            localStorage.setItem("cities", JSON.stringify(cities));
+            }
+    
+}
+
+
+
+function findCity(city){
+    $(".row-present-hdr").empty();
+    $(".row-present-list").empty();
+    $(".row-future").empty();
+    
+   var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
+   console.log(queryURL);
+
+   $.ajax({
+       url: queryURL,
+       method: "GET",
+       success: function(data, status, jqXHR){
+            lat = data.coord.lat;
+            long = data.coord.lon;
+            isValid = true;
+       },
+       error: function(jqXHR, textStatus, errorThrown) {
+            isValid = false;
+            $(".row-present-hdr").append($("<h2>").addClass("present-hdr"));
+            $(".present-hdr").text("Sorry, we cannot find this city");
+
+       }
+   }).then(function(response){
+       //console.log(response);
+        cityCheck();
+       //Make Header for present city + date + icon
+       $(".row-present-hdr").append($("<h2>").addClass("present-hdr"));
+        
+       icon = response.weather[0].icon;
+       var iconLink = "http://openweathermap.org/img/wn/" + icon + "@2x.png"; 
+       $(".present-hdr").text(city + " (" + date + ")");
+       $(".present-hdr").append($("<img>").attr("src", iconLink));
+        //Make ul with weather parameters
+        var tempK = response.main.temp;
+        var tempF = ((tempK - 273.15)*(9/5) + 32).toFixed(2);
+       $(".row-present-list").append($("<ul>").addClass("present-list"));
+       $(".present-list").append($("<li>").addClass("present-list-item").text("Temperature: " + tempF + " °F"));
+       $(".present-list").append($("<li>").addClass("present-list-item").text("Humidity: " + response.main.humidity + "%"));
+       $(".present-list").append($("<li>").addClass("present-list-item").text("Wind: " + response.wind.speed + " MPH"));
+
+        futureWeather(city, lat, long);
+
+   })          
+}
+
+function futureWeather(city, lat, long){
+    var queryURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + long + "&exclude=hourly,minutely&appid=" + apiKey;
+    console.log(queryURL);
+    $.ajax({
+       url: queryURL,
+       method: "GET",
+   }).then(function(response){
+       console.log(response.daily[5].temp.day)
+
+       for(var i = 1; i < 6; i++)
+       {
+        var dayBox =  $("<div>").addClass("col");
+         $(".row-future").append(dayBox).attr("id", "day-" + (i));
+        var nextDate = moment().add(i, "day").format("M[/]D[/]YYYY"); 
+        dayBox.append($("<h3>").text(nextDate));
+        var icon = response.daily[i].weather[0].icon;
+        var iconLink = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
+        dayBox.append($("<img>").attr("src", iconLink));
+        var tempK = response.daily[i].temp.day;
+        var tempF = ((tempK - 273.15)*(9/5) + 32).toFixed(2);
+        dayBox.append($("<p>").addClass("p").text(tempF));
+        var humidity = response.daily[i].humidity;
+        dayBox.append($("<p>").addClass("p").text(humidity));
+
+       }
+       console.log(dayBox);
+      
+    
+    })
+}
+
+getStorage();
+
+function searchCity(){
+    //Trims and capitalizes first letter and passes to AJAX function
+    console.log("FUCK")
+    btnExists = false; 
+    city = $("#city-input").val();
+    city = city.trim(); 
+    if(city === null){
+        return;
+    }
+    city = city.charAt(0).toUpperCase() + city.slice(1);
+    findCity(city);
+
+}
+
+
+$("#city-form").on("submit", function(event){
+    event.preventDefault();
+    searchCity();
+})
+
+$("#search-btn").on("click", function(event){
+    event.preventDefault();
+    searchCity();
+})
+
+
+btnDiv.on("click", function(event){
+    if(event.target.matches(".city-btn")){  
+    city = $(event.target).text();
+    findCity(city);
+    
+    }
+})
+
+        </script>
+    </div>
+</body>
+</html>
