@@ -137,8 +137,8 @@ function futureWeather(city, lat, long){
        console.log(response.daily[5].temp.day)
        //UVI CODE
        var uvi = response.current.uvi;
-       var uviEl = $("<span>").addClass("uvi-span");
-       $(".present-list").append($("<li>").addClass("present-uv present-list-item py-1 py-md-2 py-lg-3").text("UV Index: "));
+       var uviEl = $("<span>").attr("id", "uvi-span").addClass("p-1");
+       $(".present-list").append($("<li>").addClass("present-uv present-list-item py-1 py-md-2 py-lg-3 mb-2").text("UV Index: "));
        var color = uviColor(uvi);
        uviEl.addClass(color).text(uvi.toFixed(2));
        $(".present-uv").append(uviEl);
