@@ -18,7 +18,7 @@ Returns present weather conditions in the city as well as a 5 day forecast. Citi
 
 ## Preview
 
-![weather dash screenshot](./Assets/weatherss.png)
+![weather dash screenshot](Assets/weatherss.png)
 
 
 
