@@ -56,7 +56,7 @@ function getStorage(){
     if(storage !== null){
     cities = storage;
     cities.forEach(city => {
-        btnDiv.append($("<button>").addClass("city-btn py-1 py-md-2 py-lg-3 py-xl-4").text(city));
+        btnDiv.append($("<button>").addClass("city-btn py-1 py-md-2 py-lg-3").text(city));
         }); 
     }
 }
@@ -72,7 +72,7 @@ function cityCheck(){
     });
        if(btnExists === false){
             cities.push(city);
-            btnDiv.append($("<button>").addClass("city-btn").text(city));
+            btnDiv.append($("<button>").addClass("city-btn py-1 py-md-2 py-lg-3").text(city));
             localStorage.setItem("cities", JSON.stringify(cities));
             }
     
