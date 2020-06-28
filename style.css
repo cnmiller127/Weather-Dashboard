@@ -18,8 +18,9 @@ html, body, .container{
 
 .search-area{
     background-color: rgb(238, 238, 238);
-    height: 100%;
+    height: auto;;
     width: 100%;
+    
 }
 #city-form{
   width: 100%;;
