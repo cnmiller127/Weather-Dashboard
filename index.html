@@ -10,28 +10,28 @@
 </head>
 <body>
 <div class = "container-fluid p-0">
-    <header class = "row jumbotron justify-content-center m-0">
+    <header class = "row jumbotron justify-content-center m-0 p-1 p-sm-2 p-md-3">
         <h1 class = "display-4">Weather Dashboard</h1>
     </header>
     <div class = "row no-gutters">
-        <div class = "col-6 col-sm-4 col-md-3 search-area p-1">
+        <div class = "col-5 col-sm-6 col-md-3 search-area p-1">
             <div class = "row no-gutters">
-                <label><h3>Search for City: </h3></label>
+                <label class = "search-label"><p class = "m-0" >Search for City: </p></label>
                 <form id = "city-form" class = "d-flex">
                     <div class = "col-10 p-0">
                         <input type = "text" id = "city-input">
                     </div>
                     <div class = "col-2 p-0 ">
-                        <button type = "button" id = "search-btn" class = "btn-primary">🔍</button>
+                        <button type = "button" id = "search-btn" class = "btn-primary p-0">🔍</button>
                     </div>
                 </form>
                 <div id = "btn-div" class = "btn-div"></div>
             </div>
 
         </div>
-        <div class = "col-6 col-sm-8 col-md-9 p-1">
-            <div class = "row-present no-gutters mb-3 mb-lg-4"></div>
-            <div class = "row row-future no-gutters px-lg-2">
+        <div class = "col-7 col-sm-6 col-md-9 p-3 px-sm-4 px-md-0 p-xl-4">
+            <div class = "row-present no-gutters mb-3 mb-lg-4 mx-lg-2 mx-md-3 px-md-3"></div>
+            <div class = "row row-future justify-content-sm-center no-gutters ">
             </div>
         </div>
     </div>
@@ -56,7 +56,7 @@ function getStorage(){
     if(storage !== null){
     cities = storage;
     cities.forEach(city => {
-        btnDiv.append($("<button>").addClass("city-btn").text(city));
+        btnDiv.append($("<button>").addClass("city-btn py-1 py-md-2 py-lg-3 py-xl-4").text(city));
         }); 
     }
 }
@@ -98,7 +98,7 @@ function findCity(city){
        error: function(jqXHR, textStatus, errorThrown) {
             isValid = false;
             
-            $(".row-present").append($("<h2>").addClass("present-hdr m-0 pl-lg-4"));
+            $(".row-present").append($("<h2>").addClass("present-hdr h1-lg h2-md h4-sm h5 m-0 text-center text-md-left"));
             $(".present-hdr").text("Sorry, we cannot find this city");
             $(".row-present").addClass("present-border");
 
@@ -108,19 +108,19 @@ function findCity(city){
         cityCheck();
        //Make Header for present city + date + icon
        $(".row-present").addClass("present-border");
-       $(".row-present").append($("<h2>").addClass("present-hdr m-0 pl-lg-4 text-center text-md-left"));
+       $(".row-present").append($("<h2>").addClass("present-hdr m-0 text-center text-md-left"));
         
        icon = response.weather[0].icon;
        var iconLink = "http://openweathermap.org/img/wn/" + icon + "@2x.png"; 
        $(".present-hdr").text(city + " (" + date + ")");
-       $(".present-hdr").append($("<img>").addClass("icon").attr("src", iconLink));
+       $(".present-hdr").append($("<img>").addClass("icon d-block m-auto d-md-inline m-md-0 ").attr("src", iconLink));
         //Make ul with weather parameters
         var tempK = response.main.temp;
         var tempF = ((tempK - 273.15)*(9/5) + 32).toFixed(2);
-       $(".row-present").append($("<ul>").addClass("present-list m-0 pl-lg-4 text-center text-md-left"));
-       $(".present-list").append($("<li>").addClass("present-list-item").text("Temperature: " + tempF + " °F"));
-       $(".present-list").append($("<li>").addClass("present-list-item").text("Humidity: " + response.main.humidity + "%"));
-       $(".present-list").append($("<li>").addClass("present-list-item").text("Wind: " + response.wind.speed + " MPH"));
+       $(".row-present").append($("<ul>").addClass("present-list m-0  text-center text-md-left"));
+       $(".present-list").append($("<li>").addClass("present-list-item py-1 py-md-2 py-lg-3").text("Temperature: " + tempF + " °F"));
+       $(".present-list").append($("<li>").addClass("present-list-item py-1 py-md-2 py-lg-3").text("Humidity: " + response.main.humidity + "%"));
+       $(".present-list").append($("<li>").addClass("present-list-item py-1 py-md-2 py-lg-3").text("Wind: " + response.wind.speed + " MPH"));
 
         futureWeather(city, lat, long);
 
@@ -138,28 +138,28 @@ function futureWeather(city, lat, long){
        //UVI CODE
        var uvi = response.current.uvi;
        var uviEl = $("<span>").addClass("uvi-span");
-       $(".present-list").append($("<li>").addClass("present-list-item-uv").text("UV Index: "));
+       $(".present-list").append($("<li>").addClass("present-uv present-list-item py-1 py-md-2 py-lg-3").text("UV Index: "));
        var color = uviColor(uvi);
-       uviEl.addClass(color).text(uvi);
-       $(".present-list-item-uv").append(uviEl);
+       uviEl.addClass(color).text(uvi.toFixed(2));
+       $(".present-uv").append(uviEl);
 
 
        for(var i = 1; i < 6; i++)
        {
-        var outer = $("<div>").addClass("col-12 col-sm-8 col-md-6 col-lg px-lg-2");
+        var outer = $("<div>").addClass("col-12 col-md-6 col-lg px-md-3 px-lg-2 pb-3");
         $(".row-future").append(outer)
         var dayBox =  $("<div>").addClass("forecast");
         outer.append(dayBox).attr("id", "day-" + (i));
         var nextDate = moment().add(i, "day").format("M[/]D[/]YYYY"); 
-        dayBox.append($("<h3>").text(nextDate));
+        dayBox.append($("<p>").addClass("future-hdr").text(nextDate));
         var icon = response.daily[i].weather[0].icon;
         var iconLink = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
         dayBox.append($("<img>").attr("src", iconLink));
         var tempK = response.daily[i].temp.day;
         var tempF = ((tempK - 273.15)*(9/5) + 32).toFixed(2);
-        dayBox.append($("<p>").addClass("p").text(("Temp: " + tempF + " °F")));
+        dayBox.append($("<p>").addClass("future-text").text(("Temp: " + tempF + " °F")));
         var humidity = response.daily[i].humidity;
-        dayBox.append($("<p>").addClass("p").text("Humidity: " + humidity + "%"));
+        dayBox.append($("<p>").addClass("future-text").text("Humidity: " + humidity + "%"));
 
        }
        console.log(dayBox);
@@ -172,7 +172,7 @@ function futureWeather(city, lat, long){
 
 function searchCity(){
     //Trims and capitalizes first letter and passes to AJAX function
-    console.log("FUCK")
+    
     btnExists = false; 
     city = $("#city-input").val();
     city = city.trim(); 
@@ -180,6 +180,8 @@ function searchCity(){
         return;
     }
     city = city.charAt(0).toUpperCase() + city.slice(1);
+    $("#city-input").val("");
+
     findCity(city);
 
 }
