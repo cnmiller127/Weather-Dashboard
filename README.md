@@ -15,7 +15,8 @@ Returns present weather conditions in the city as well as a 5 day forecast. Citi
 - AJAX was used for weather server communication
 - Code attempts to prevent program from crashing, and creating unneccesary buttons of cities that do not exist
 
-
+## Gitpages Link
+[Weather Dashboard](https://cnmiller127.github.io/Weather-Dashboard/)
 ## Preview
 
 ![Image](Assets/wthr.png)
